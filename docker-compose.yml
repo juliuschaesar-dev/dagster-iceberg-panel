@@ -6,15 +6,15 @@ services:
     container_name: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-lakekeeper}
-      POSTGRES_USER: ${POSTGRES_USER:-lakekeeper}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lakekeeper}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -24,8 +24,8 @@ services:
     container_name: garage
     restart: unless-stopped
     environment:
-      GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET:?GARAGE_RPC_SECRET is required}
-      GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN:?GARAGE_ADMIN_TOKEN is required}
+      GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET}
+      GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN}
     ports:
       - "3900:3900"  # S3 API
       - "3901:3901"  # RPC
@@ -49,9 +49,9 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      LAKEKEEPER__PG_ENCRYPTION_KEY: ${LAKEKEEPER_PG_ENCRYPTION_KEY:-changeme-encryption-key}
-      LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://${POSTGRES_USER:-lakekeeper}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lakekeeper}
-      LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://${POSTGRES_USER:-lakekeeper}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lakekeeper}
+      LAKEKEEPER__PG_ENCRYPTION_KEY: ${LAKEKEEPER_PG_ENCRYPTION_KEY}
+      LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
 
   lakekeeper:
     image: quay.io/lakekeeper/catalog:v0.13.5
@@ -62,9 +62,9 @@ services:
       lakekeeper-init:
         condition: service_completed_successfully
     environment:
-      LAKEKEEPER__PG_ENCRYPTION_KEY: ${LAKEKEEPER_PG_ENCRYPTION_KEY:-changeme-encryption-key}
-      LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://${POSTGRES_USER:-lakekeeper}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lakekeeper}
-      LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://${POSTGRES_USER:-lakekeeper}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lakekeeper}
+      LAKEKEEPER__PG_ENCRYPTION_KEY: ${LAKEKEEPER_PG_ENCRYPTION_KEY}
+      LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       RUST_LOG: info
     ports:
       - "8181:8181"
@@ -84,8 +84,8 @@ services:
       garage:
         condition: service_healthy
     environment:
-      GARAGE_ACCESS_KEY_ID: ${GARAGE_ACCESS_KEY_ID:?GARAGE_ACCESS_KEY_ID is required}
-      GARAGE_SECRET_ACCESS_KEY: ${GARAGE_SECRET_ACCESS_KEY:?GARAGE_SECRET_ACCESS_KEY is required}
+      GARAGE_ACCESS_KEY_ID: ${GARAGE_ACCESS_KEY_ID}
+      GARAGE_SECRET_ACCESS_KEY: ${GARAGE_SECRET_ACCESS_KEY}
     ports:
       - "8080:8080"
     volumes:
@@ -108,7 +108,7 @@ services:
     environment:
       TRINO_HOST: trino
       TRINO_PORT: 8080
-      TRINO_USER: dagster
+      TRINO_USER: ${TRINO_USER}
       TRINO_CATALOG: iceberg
       TRINO_SCHEMA_DATAMART: datamart
     ports:
